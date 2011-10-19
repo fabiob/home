@@ -1,0 +1,5 @@
+begin
+  require 'capistrano_colors'
+rescue LoadError => e
+  puts "The gem 'capistrano_colors' is not installed."
+end
