@@ -1,11 +1,45 @@
-alias ll='ls -lG'
-export POSITION='top'
-[[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm"
+# ajuste para uso do Ruby no MacOS X Lion
+export CC=/usr/bin/gcc-4.2
 
+# adaptação para Homebrew
+export PATH=/usr/local/bin:$PATH
+
+# Oracle Instant Client
+# 64-bit: export DYLD_LIBRARY_PATH=/usr/lib/oracle/instantclient
+export DYLD_LIBRARY_PATH=/usr/lib/oracle/instantclient_10_2-i386
+export ORACLE_HOME=/usr/lib/oracle/instantclient
+export SQLPATH=/usr/lib/oracle/instantclient
+export TNS_ADMIN=/usr/lib/oracle/network/admin
+export NLS_LANG=AMERICAN_AMERICA.UTF8
+export PATH=$PATH:/usr/lib/oracle/instantclient
+
+# MySQL
 export PATH=$PATH:/usr/local/mysql/bin
+# 64-bit: export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:/usr/local/mysql/lib
+export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:/usr/local/mysql-5.5.14-osx10.6-x86/lib
 
-export NLS_LANG="AMERICAN_AMERICA.UTF8"
-export PATH=/usr/local/bin:/usr/local/sbin:$PATH:~/Projects/CCDE/ccde-tools/scripts
+# Subversion
+export PATH=/opt/subversion/bin:$PATH
 
-# Oracle and MySQL 32-bit
-export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:/usr/local/mysql-5.5.15-osx10.6-x86/lib:/usr/lib/oracle/instantclient_10_2
+# PostgreSQL
+export PATH=/Library/PostgreSQL/9.0/bin:$PATH
+export PGDATA=/Library/PostgreSQL/9.0/data
+
+# MongoDB
+export PATH=/Library/MongoDB/mongodb-osx-x86_64-1.6.3/bin:$PATH
+
+# RVM
+[[ -s "$HOME/.rvm/scripts/rvm" ]] && . "$HOME/.rvm/scripts/rvm"  # This loads RVM into a shell session.
+
+# Complete para rake, thor e cap
+source $HOME/bin/rake_cap_bash_autocomplete.sh
+
+# Modificações pessoais
+alias ls='ls -G'
+alias ll='ls -l'
+alias l.='ls -d * .*'
+
+export PS1='[\u@\h \W]\$ ' # prompt igual ao do Linux
+export LC_CTYPE="en_US.UTF-8"
+
+export PATH=$HOME/bin:$PATH
