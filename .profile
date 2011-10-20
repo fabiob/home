@@ -31,6 +31,9 @@ export PGDATA=/Library/PostgreSQL/9.0/data
 # MongoDB
 export PATH=/Library/MongoDB/mongodb-osx-x86_64-1.6.3/bin:$PATH
 
+# node.js
+NODE_PATH=/usr/local/lib/node_modules:$NODE_PATH
+
 # RVM
 [[ -s "$HOME/.rvm/scripts/rvm" ]] && . "$HOME/.rvm/scripts/rvm"  # This loads RVM into a shell session.
 
