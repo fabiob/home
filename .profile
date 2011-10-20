@@ -1,3 +1,6 @@
+# habilita cores no "ls"
+export CLICOLOR=1
+
 # ajuste para uso do Ruby no MacOS X Lion
 export CC=/usr/bin/gcc-4.2
 
@@ -32,11 +35,10 @@ export PATH=/Library/MongoDB/mongodb-osx-x86_64-1.6.3/bin:$PATH
 [[ -s "$HOME/.rvm/scripts/rvm" ]] && . "$HOME/.rvm/scripts/rvm"  # This loads RVM into a shell session.
 
 # Complete para rake, thor e cap
-source $HOME/bin/rake_cap_bash_autocomplete.sh
+[[ -s "$HOME/bin/rake_cap_bash_autocomplete.sh" ]] && . "$HOME/bin/rake_cap_bash_autocomplete.sh"
 
 # Modificações pessoais
-alias ls='ls -G'
-alias ll='ls -l'
+alias ll='ls -l -h'
 alias l.='ls -d * .*'
 
 export PS1='[\u@\h \W]\$ ' # prompt igual ao do Linux
