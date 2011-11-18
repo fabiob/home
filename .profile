@@ -19,7 +19,7 @@ export PATH=$PATH:/usr/lib/oracle/instantclient
 # MySQL
 export PATH=$PATH:/usr/local/mysql/bin
 # 64-bit: export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:/usr/local/mysql/lib
-export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:/usr/local/mysql-5.5.14-osx10.6-x86/lib
+export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:/usr/local/mysql-x86/lib
 
 # Subversion
 export PATH=/opt/subversion/bin:$PATH
