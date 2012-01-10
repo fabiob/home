@@ -1,4 +1,5 @@
 begin
+  require 'rubygems'
   require 'hirb'
   extend Hirb::Console
   Hirb.config[:width] = 250
