@@ -21,6 +21,10 @@ export PATH=$PATH:/usr/local/mysql/bin
 # 64-bit: export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:/usr/local/mysql/lib
 export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:/usr/local/mysql-x86/lib
 
+# Firebird
+export FIREBIRD_HOME=/Library/Frameworks/Firebird.framework/Versions/A/Resources
+export PATH=$PATH:$FIREBIRD_HOME/bin
+
 # Subversion
 export PATH=/opt/subversion/bin:$PATH
 
