@@ -17,16 +17,9 @@ export NLS_LANG=AMERICAN_AMERICA.UTF8
 export PATH=$PATH:/usr/lib/oracle/instantclient
 
 # MySQL
-export PATH=$PATH:/usr/local/mysql/bin
-# 64-bit: export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:/usr/local/mysql/lib
-export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:/usr/local/mysql-x86/lib
-
-# Firebird
-export FIREBIRD_HOME=/Library/Frameworks/Firebird.framework/Versions/A/Resources
-export PATH=$PATH:$FIREBIRD_HOME/bin
-
-# Subversion
-export PATH=/opt/subversion/bin:$PATH
+export MYSQL_HOME=/usr/local/mysql-x86
+export PATH=$PATH:$MYSQL_HOME/bin
+export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:$MYSQL_HOME/lib
 
 # PostgreSQL
 export PATH=/Library/PostgreSQL/9.0/bin:$PATH
