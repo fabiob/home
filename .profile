@@ -31,9 +31,6 @@ export PATH=/Library/MongoDB/mongodb-osx-x86_64-1.6.3/bin:$PATH
 # node.js
 NODE_PATH=/usr/local/lib/node_modules:$NODE_PATH
 
-# RVM
-[[ -s "$HOME/.rvm/scripts/rvm" ]] && . "$HOME/.rvm/scripts/rvm"  # This loads RVM into a shell session.
-
 # Complete para rake, thor e cap
 [[ -s "$HOME/bin/rake_cap_bash_autocomplete.sh" ]] && . "$HOME/bin/rake_cap_bash_autocomplete.sh"
 
@@ -45,3 +42,5 @@ export PS1='[\u@\h \W]\$ ' # prompt igual ao do Linux
 export LC_CTYPE="en_US.UTF-8"
 
 export PATH=$HOME/bin:$PATH
+
+[[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
