@@ -4,7 +4,7 @@ export CLICOLOR=1
 # ativa UTF-8 nos fontes do Ruby como padrão
 export LC_CTYPE=en_US.UTF-8
 
-# adaptação para Homebrew
+# adaptação para Homebrew: incluir /usr/local/bin *antes* de /usr/bin
 export PATH=/usr/local/bin:$PATH
 
 # EC2 tools
@@ -43,8 +43,14 @@ export PATH=$PATH:$FIREBIRD_HOME/bin
 export NODE_PATH=/usr/local/lib/node_modules:$NODE_PATH
 export PATH=./node_modules/.bin:$PATH
 
+# Rails + Spring
+export PATH=./bin:$PATH
+
 # Android SDK
 export ANDROID_SDK_ROOT=/usr/local/opt/android-sdk
+
+# z
+. `brew --prefix`/etc/profile.d/z.sh
 
 # Modificações pessoais
 alias ll='ls -l -h'
@@ -57,3 +63,5 @@ export PATH=$HOME/bin:$PATH
 
 [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
 
+# direnv: https://github.com/zimbatm/direnv
+eval "$(direnv hook $0)"
