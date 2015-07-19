@@ -1,8 +1,8 @@
+# define o Vim como o editor padrão
+export EDITOR=vim
+
 # habilita cores no "ls"
 export CLICOLOR=1
-
-# ativa UTF-8 nos fontes do Ruby como padrão
-export LC_CTYPE=en_US.UTF-8
 
 # adaptação para Homebrew: incluir /usr/local/bin *antes* de /usr/bin
 export PATH=/usr/local/bin:$PATH
@@ -15,6 +15,12 @@ if [ -d "$HOME/.ec2" ]; then
   export EC2_HOME="/usr/local/Library/LinkedKegs/ec2-api-tools/jars"
   export EC2_AMITOOL_HOME="/usr/local/Library/LinkedKegs/ec2-ami-tools/jars"
 fi
+
+# AWS CLI
+complete -C aws_completer aws
+
+# Docker
+eval "$(docker-machine env dev)"
 
 # Oracle Instant Client
 #export DYLD_LIBRARY_PATH=/usr/lib/oracle/instantclient
@@ -37,10 +43,6 @@ export PGDATA=/Library/PostgreSQL/9.0/data
 # MongoDB
 export PATH=/Library/MongoDB/mongodb-osx-x86_64-1.6.3/bin:$PATH
 
-# Firebird
-export FIREBIRD_HOME=/Library/Frameworks/Firebird.framework/Resources
-export PATH=$PATH:$FIREBIRD_HOME/bin
-
 # node.js
 export NODE_PATH=/usr/local/lib/node_modules:$NODE_PATH
 export PATH=./node_modules/.bin:$PATH
@@ -50,19 +52,28 @@ export PATH=./bin:$PATH
 
 # Android SDK
 export ANDROID_SDK_ROOT=/usr/local/opt/android-sdk
+export ANDROID_HOME=/usr/local/opt/android-sdk
+
+# Go
+export PATH=$PATH:/usr/local/opt/go/libexec/bin
 
 # z
 . `brew --prefix`/etc/profile.d/z.sh
 
 # Modificações pessoais
-alias ll='ls -l -h'
-alias l.='ls -d * .*'
+alias ll='ls -l -h'           # "ls" mais amigável
+alias l.='ls -d * .*'         # "ls" para arquivos ocultos
 
-export PS1='[\u@\h \W]\$ ' # prompt igual ao do Linux
-export LC_CTYPE="en_US.UTF-8"
+export PS1='[\u@\h \W]\$ '    # prompt igual ao do Linux
+export LC_CTYPE="en_US.UTF-8" # locale americano e codificação UTF-8 como padrão
 
-export PATH=$HOME/bin:$PATH
+export PATH=$HOME/bin:$PATH   # ~/bin como primeiro item do $PATH
 
+# NVM
+export NVM_DIR=~/.nvm
+source $(brew --prefix nvm)/nvm.sh
+
+# RVM
 [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
 
 # direnv: https://github.com/zimbatm/direnv
