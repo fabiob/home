@@ -1,15 +1,22 @@
 #!/bin/sh
 set -e
+set -x
 
 while [[ $# > 0 ]]; do
-  case "$1" in
+  v="$1"
+  case "$v" in
     '-a')
       app=$2
       shift
-    ;;
+      ;;
+    *)
+      cmd="${cmd}${v} "
+      ;;
   esac
   shift
 done
+
+cmd="${cmd:-sh}"
 
 profile=$DEIS_PROFILE
 url=$(underscore --outfmt text extract controller < ~/.deis/${profile}.json)
@@ -19,4 +26,4 @@ json=$(curl -s -H "Authorization: token $token" $url/v1/apps/${app}/containers)
 
 version=$(echo $json | underscore extract --outfmt text 'results.0.release')
 
-exec ssh -t core@$DEISCTL_TUNNEL "docker run -it --rm \$(etcdctl get deis/registry/host):\$(etcdctl get deis/registry/port)/${app}:${version} bash"
+exec ssh -t core@$DEISCTL_TUNNEL "docker run -it --rm \$(etcdctl get deis/registry/host):\$(etcdctl get deis/registry/port)/${app}:${version} ${cmd} $@"
