@@ -1,8 +1,0 @@
-#!/bin/bash
-
-tunnels[1]="-L 15210:172.16.17.40:1521" # Oracle PORTALP
-tunnels[2]="-L 15211:172.16.17.41:1521" # Oracle PORTALPB
-tunnels[3]="-L 15212:172.16.17.42:1521" # Oracle PORTALD, PORTALH
-tunnels[4]="-L 15217:172.16.17.117:1521" # Oracle DBVO
-
-ssh -A ${tunnels[@]:0} elementar@dev.ccde.com.br -p 8222 $@
