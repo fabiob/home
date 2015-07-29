@@ -1,6 +1,12 @@
-#!/bin/sh
+#!/bin/bash
 set -e
-set -x
+
+function erro() { echo $@; exit 1; }
+
+host="$DEISCTL_TUNNEL"
+cmd=()
+
+CURLOPTS=-s
 
 while [[ $# > 0 ]]; do
   v="$1"
@@ -9,21 +15,34 @@ while [[ $# > 0 ]]; do
       app=$2
       shift
       ;;
+    '-h')
+      host=$2
+      shift
+      ;;
+    '-v')
+      CURLOPTS=-v
+      set -x
+      ;;
     *)
-      cmd="${cmd}${v} "
+      cmd=( "${cmd[@]}" "$v" )
       ;;
   esac
   shift
 done
 
-cmd="${cmd:-sh}"
+[[ ${#cmd[@]} == 0 ]] && cmd=( "sh" )
 
-profile=$DEIS_PROFILE
-url=$(underscore --outfmt text extract controller < ~/.deis/${profile}.json)
-token=$(underscore --outfmt text extract token < ~/.deis/${profile}.json)
+profile="$DEIS_PROFILE"
+f="${HOME}/.deis/${profile}.json"
 
-json=$(curl -s -H "Authorization: token $token" $url/v1/apps/${app}/containers)
+[[ -f $f ]] && [[ -r $f ]] || erro "O arquivo $f não existe ou não está acessível"
 
-version=$(echo $json | underscore extract --outfmt text 'results.0.release')
+url=$( underscore --outfmt text extract controller < "$f" || erro "Não foi possível extrair o controller do perfil: $profile" )
+token=$( underscore --outfmt text extract token < "$f" || erro "Não foi possível extrair o token do perfil: $profile" )
 
-exec ssh -t core@$DEISCTL_TUNNEL "docker run -it --rm \$(etcdctl get deis/registry/host):\$(etcdctl get deis/registry/port)/${app}:${version} ${cmd} $@"
+json=$( curl --fail $CURLOPTS -H "Authorization: token $token" $url/v1/apps/${app}/containers || erro "Não foi possível obter a lista de containers: curl retornou $?" )
+
+version=$( echo $json | underscore extract --outfmt text 'results.0.release' || erro "Não foi possível obter o identificador do último release" )
+
+args=`printf '%q ' "${cmd[@]}"`
+exec ssh -t core@${host} "bash -c 'img=\$(etcdctl get deis/registry/host):\$(etcdctl get deis/registry/port)/${app}:${version}; set -x; docker run -it --rm \${img} ""${args}""'"
