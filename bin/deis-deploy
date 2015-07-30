@@ -5,17 +5,15 @@ set -e
 remote='deis-production'
 app=$(basename `pwd`)
 branch='master'
-sidekiq="$app"
 
 function usage() {
   cat <<USAGE
-Uso: $0 [-a APP] [-r REMOTE] [-b BRANCH] [-k TAG] [-t TITULO] <descricao>
+Uso: $0 [-a APP] [-r REMOTE] [-b BRANCH] [-t TITULO] <descricao>
 
   <descricao>           A descrição do deploy. Normalmente é o motivo da instalação.
   -a, --app     APP     O nome do aplicativo a instalar (padrão: $app).
   -r, --remote  REMOTE  O remote do GIT para onde fazer o push (padrão: $remote).
   -b, --branch  BRANCH  O branch a fazer push (padrão: $branch).
-  -k, --sidekiq TAG     A tag dos processos do Sidekiq a enviar USR1 (padrão: $sidekiq).
   -t, --title   TITULO  O título do deploy. Normalmente é um número de versão.
   -l, --list            Lista os deploys realizados.
   -h, --help            Exibe esta tela.
@@ -52,10 +50,6 @@ while (( $# > 0 )); do
       remote="$2"
       shift
       ;;
-    -k|--sidekiq)
-      sidekiq="$2"
-      shift
-      ;;
     -b|--branch)
       branch="$2"
       shift
@@ -90,7 +84,6 @@ fi
 echo "Utilizando:"
 echo "APP........: ${app}"
 echo "REMOTE.....: ${remote}"
-echo "SIDEKIQ....: ${sidekiq}"
 echo "BRANCH.....: ${branch}"
 echo "TITLE......: ${title}"
 echo "DESCRIPTION: ${desc[@]}"
@@ -98,8 +91,6 @@ echo
 echo "!! AVISO: lembre de pausar as filas do Sidekiq antes de proceder com o deploy !!"
 echo
 read -p "Pressione ENTER para continuar, ou ^C para cancelar."
-
-set -x
 
 id=$( curl --fail -s -XPOST -u "${LIBRATO_USER}:${LIBRATO_TOKEN}" \
            "https://metrics-api.librato.com/v1/annotations/deployments" \
