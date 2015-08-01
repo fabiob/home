@@ -67,7 +67,10 @@ if [[ ! -z "$list" ]]; then
   exit 1
 fi
 
-if [[ ${#desc[@]} == 0 ]]; then
+desc="$( printf "%s " "${desc[@]}" )"
+desc="${desc:0:(${#desc} - 1)}"
+
+if (( ${#desc} < 5 )); then
   echo "ERRO: é obrigatório informar a descrição do deploy" > /dev/stderr
   usage 1
 fi
@@ -86,7 +89,7 @@ echo "APP........: ${app}"
 echo "REMOTE.....: ${remote}"
 echo "BRANCH.....: ${branch}"
 echo "TITLE......: ${title}"
-echo "DESCRIPTION: ${desc[@]}"
+echo "DESCRIPTION: '${desc}'"
 echo
 echo "!! AVISO: lembre de pausar as filas do Sidekiq antes de proceder com o deploy !!"
 echo
@@ -95,8 +98,8 @@ read -p "Pressione ENTER para continuar, ou ^C para cancelar."
 id=$( curl --fail -s -XPOST -u "${LIBRATO_USER}:${LIBRATO_TOKEN}" \
            "https://metrics-api.librato.com/v1/annotations/deployments" \
            -d "title=`printf '%q ' "$title"`" \
-           -d "description=`printf '%q ' "${desc[@]}"`" \
-           -d "start_time=`date +%s`" | tee /dev/stderr | \
+           -d "description=${desc}" \
+           -d "start_time=`date +%s`" | \
       underscore extract --outfmt text 'id' ) || erro "Erro ao informar o deployment ao Librato"
 
 #deis console rails r "puts Sidekiq::ProcessSet.new.select {|p| p.tag == '$sidekiq' }.map(&:quiet!).count" -a "$app" || \
