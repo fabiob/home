@@ -20,7 +20,7 @@ fi
 complete -C aws_completer aws
 
 # Docker
-eval "$(docker-machine env dev)"
+[[ `docker-machine status dev` != 'Stopped' ]] && eval "$(docker-machine env dev)"
 
 # Oracle Instant Client
 #export DYLD_LIBRARY_PATH=/usr/lib/oracle/instantclient
