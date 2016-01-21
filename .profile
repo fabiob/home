@@ -4,8 +4,8 @@ export EDITOR=vim
 # habilita cores no "ls"
 export CLICOLOR=1
 
-# adaptação para Homebrew: incluir /usr/local/bin *antes* de /usr/bin
-export PATH=/usr/local/bin:$PATH
+# adaptação para Homebrew: incluir /usr/local/[s]bin *antes* de /usr/bin
+export PATH=/usr/local/sbin:/usr/local/bin:$PATH
 
 # EC2 tools
 if [ -d "$HOME/.ec2" ]; then
