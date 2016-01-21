@@ -20,6 +20,7 @@ while [[ $# > 0 ]]; do
       shift
       ;;
     '-v')
+      DEBUG=1
       CURLOPTS=-v
       set -x
       ;;
