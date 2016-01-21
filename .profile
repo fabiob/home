@@ -60,6 +60,9 @@ export PATH=$PATH:/usr/local/opt/go/libexec/bin
 # z
 . `brew --prefix`/etc/profile.d/z.sh
 
+# Homebrew bash completion
+[ -f $(brew --prefix)/etc/bash_completion ] && . $(brew --prefix)/etc/bash_completion
+
 # Modificações pessoais
 alias ll='ls -l -h'           # "ls" mais amigável
 alias l.='ls -d * .*'         # "ls" para arquivos ocultos
