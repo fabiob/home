@@ -76,5 +76,7 @@ source $(brew --prefix nvm)/nvm.sh
 # RVM
 [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
 
+export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
+
 # direnv: https://github.com/zimbatm/direnv
 eval "$(direnv hook $0)"
