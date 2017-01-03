@@ -19,18 +19,6 @@ fi
 # AWS CLI
 complete -C aws_completer aws
 
-# Docker
-[[ `docker-machine status dev` != 'Stopped' ]] && eval "$(docker-machine env dev)"
-
-# Oracle Instant Client
-#export DYLD_LIBRARY_PATH=/usr/lib/oracle/instantclient
-##export DYLD_LIBRARY_PATH=/usr/lib/oracle/instantclient_10_2-i386
-#export ORACLE_HOME=/usr/lib/oracle/instantclient
-#export SQLPATH=/usr/lib/oracle/instantclient
-#export TNS_ADMIN=/usr/lib/oracle/network/admin
-#export NLS_LANG=AMERICAN_AMERICA.UTF8
-#export PATH=$PATH:/usr/lib/oracle/instantclient
-
 # MySQL
 export MYSQL_HOME=/usr/local/mysql-x86_64
 export PATH=$PATH:$MYSQL_HOME/bin
@@ -66,11 +54,15 @@ export PATH=$PATH:/usr/local/opt/go/libexec/bin
 # Modificações pessoais
 alias ll='ls -l -h'           # "ls" mais amigável
 alias l.='ls -d * .*'         # "ls" para arquivos ocultos
+alias dcl='docker-cloud'
 
 export PS1='[\u@\h \W]\$ '    # prompt igual ao do Linux
 export LC_CTYPE="en_US.UTF-8" # locale americano e codificação UTF-8 como padrão
 
 export PATH=$HOME/bin:$PATH   # ~/bin como primeiro item do $PATH
+
+# direnv: https://github.com/zimbatm/direnv
+eval "$(direnv hook $0)"
 
 # NVM
 export NVM_DIR=~/.nvm
@@ -80,6 +72,3 @@ source $(brew --prefix nvm)/nvm.sh
 [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
 
 export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
-
-# direnv: https://github.com/zimbatm/direnv
-eval "$(direnv hook $0)"
