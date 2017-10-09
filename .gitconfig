@@ -1,6 +1,7 @@
 [user]
-	name = Fábio D. Batista
+	name = Fábio Batista
 	email = fabio@elementarsistemas.com.br
+	signingkey = DB018B72
 [color]
 	diff = auto
 	status = auto
@@ -15,9 +16,19 @@
 	smudge = git-media-smudge %f
 [alias]
 	undo-commit = reset --soft HEAD^
+	branch2tag = "!sh -c 'set -e;git tag $1 refs/heads/$1;git branch -D $1' -"
+	tags = tag --sort v:refname -n1
 [difftool "sourcetree"]
 	cmd = opendiff \"$LOCAL\" \"$REMOTE\"
 	path = 
 [mergetool "sourcetree"]
 	cmd = /Applications/SourceTree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
 	trustExitCode = true
+[filter "lfs"]
+	required = true
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+[commit]
+	template = /Users/fabio/.stCommitMsg
+	gpgsign = true
