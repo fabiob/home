@@ -9,7 +9,7 @@ export PATH=/usr/local/sbin:/usr/local/bin:$PATH
 
 # EC2 tools
 if [ -d "$HOME/.ec2" ]; then
-  export JAVA_HOME="$(/usr/libexec/java_home)"
+  # export JAVA_HOME="$(/usr/libexec/java_home)"
   export EC2_PRIVATE_KEY="$(/bin/ls "$HOME"/.ec2/pk-*.pem | /usr/bin/head -1)"
   export EC2_CERT="$(/bin/ls "$HOME"/.ec2/cert-*.pem | /usr/bin/head -1)"
   export EC2_HOME="/usr/local/Library/LinkedKegs/ec2-api-tools/jars"
@@ -39,8 +39,13 @@ export PATH=./node_modules/.bin:$PATH
 export PATH=./bin:$PATH
 
 # Android SDK
-export ANDROID_SDK_ROOT=/usr/local/opt/android-sdk
-export ANDROID_HOME=/usr/local/opt/android-sdk
+#export ANDROID_SDK_ROOT=/usr/local/opt/android-sdk
+#export ANDROID_HOME=/usr/local/opt/android-sdk
+export ANDROID_HOME=${HOME}/Library/Android/sdk
+export ANDROID_SDK_ROOT=${ANDROID_HOME}
+export PATH=${PATH}:${ANDROID_HOME}/emulator
+export PATH=${PATH}:${ANDROID_HOME}/tools
+export PATH=${PATH}:${ANDROID_HOME}/platform-tools
 
 # Go
 export PATH=$PATH:/usr/local/opt/go/libexec/bin
@@ -55,14 +60,23 @@ export PATH=$PATH:/usr/local/opt/go/libexec/bin
 alias ll='ls -l -h'           # "ls" mais amigável
 alias l.='ls -d * .*'         # "ls" para arquivos ocultos
 alias dcl='docker-cloud'
+alias dps='docker ps --format "table {{.ID}}\t{{.Image}}\t{{.Command}}\t{{.Status}}\t{{.Ports}}\t{{.Names}}"'
+alias subs='subliminal download -l pt-BR -p addic7ed -p opensubtitles -p legendastv -p podnapisi -p shooter -p subscenter -p thesubdb -p tvsubtitles -r metadata -r omdb -r tvdb -v'
 
 export PS1='[\u@\h \W]\$ '    # prompt igual ao do Linux
 export LC_CTYPE="en_US.UTF-8" # locale americano e codificação UTF-8 como padrão
 
 export PATH=$HOME/bin:$PATH   # ~/bin como primeiro item do $PATH
 
+# yarn
+export PATH="$PATH:$HOME/.config/yarn/global/node_modules/.bin"
+
 # direnv: https://github.com/zimbatm/direnv
 eval "$(direnv hook $0)"
+
+# jenv
+export PATH="$HOME/.jenv/bin:$PATH"
+eval "$(jenv init -)"
 
 # NVM
 export NVM_DIR=~/.nvm
