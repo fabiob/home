@@ -1,0 +1,6 @@
+#!/usr/bin/env python3
+
+import sys
+import secrets
+
+print(secrets.token_urlsafe(int(sys.argv[1])))

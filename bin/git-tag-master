@@ -1,0 +1,10 @@
+#!/bin/sh
+set -e
+set -o pipefail
+
+if [ -z "$1" ]; then
+	echo "É obrigatório dar um nome à tag"
+	exit 1
+fi
+
+git checkout master && git pull && git tag -sfa "$@" && git push --tags -f

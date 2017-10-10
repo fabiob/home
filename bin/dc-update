@@ -1,0 +1,4 @@
+#!/bin/bash
+set -x
+
+docker-cloud stack update -f "$1" "${1%.*}"

@@ -1,0 +1,14 @@
+#!/bin/bash
+c="$1"
+
+if [[ -z $c ]]; then
+	echo "Uso: $(basename $0) <container> [command]"
+	exit 1
+fi
+
+shift
+args="$@"
+if [[ -z $args ]]; then
+	args="bash"
+fi
+docker-cloud exec $c sh -c "TERM=xterm COLUMNS=200 $args"
