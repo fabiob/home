@@ -1,2 +1,0 @@
-#!/bin/sh
-open -W "/Applications/Visual Studio Code.app" --args "$@"
