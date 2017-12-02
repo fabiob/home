@@ -1,0 +1,9 @@
+#!/bin/bash
+set -e
+
+DC="docker-compose -f docker-compose.test.yml"
+TO_PULL="$($DC config --services | grep -xv sut | cat)"
+
+[[ ! -z $TO_PULL ]] && $DC pull --parallel $TO_PULL
+$DC build --pull sut
+$DC run sut
