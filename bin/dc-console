@@ -1,4 +1,7 @@
 #!/bin/bash
+set -e
+set -o pipefail
+
 c="$1"
 DC_CMD="docker-cloud"
 
@@ -9,7 +12,11 @@ fi
 
 if [[ ! $c =~ -[0-9]+$ ]]; then
 	# if a service name is specified, select a random running container to exec
-	c=$($DC_CMD container ps --service "$c" -s Running -q | shuf -n1)
+	row=$($DC_CMD container ps --service "$c" -s Running | tail -n+2 | shuf -n1)
+	c=$(echo $row | cut -f2 -d' ')
+	name=$(echo $row | cut -f1 -d' ')
+	stack=$(echo $row | egrep -o '\S+$')
+	echo "Using container: ${name}.${stack}" 1>&2
 fi
 
 shift
@@ -17,4 +24,5 @@ args="$@"
 if [[ -z $args ]]; then
 	args="sh"
 fi
-$DC_CMD exec $c sh -c "TERM=$TERM COLUMNS=$(tput cols) $args"
+cols=$(tput cols)
+$DC_CMD exec $c sh -c "TERM=xterm COLUMNS=$cols $args"
