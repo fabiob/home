@@ -1,0 +1,12 @@
+#!/bin/bash
+
+OUTFILE="/tmp/pool-cmd-$$.out"
+
+trap "{ rm -f $OUTFILE; }" EXIT
+
+while true; do
+    "${@}" > $OUTFILE
+    clear
+    cat $OUTFILE
+    sleep 2
+done
