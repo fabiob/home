@@ -3,4 +3,5 @@
 import sys
 import secrets
 
-print(secrets.token_urlsafe(int(sys.argv[1])))
+size = int(sys.argv[1])
+print(secrets.token_urlsafe(size)[1:size])
