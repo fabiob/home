@@ -4,9 +4,16 @@ OUTFILE="/tmp/pool-cmd-$$.out"
 
 trap "{ rm -f $OUTFILE; }" EXIT
 
+clear=""
+
+if [ "$1" == "-c" ]; then
+    clear="clear"
+    shift
+fi
+
 while true; do
     "${@}" > $OUTFILE
-    clear
+    $clear
     cat $OUTFILE
     sleep 2
 done
