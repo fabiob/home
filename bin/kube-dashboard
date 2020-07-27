@@ -1,0 +1,21 @@
+#!/bin/sh
+set -e
+
+NAMESPACE=kubernetes-dashboard
+POD_NAME=$(kubectl get pods -n $NAMESPACE -l "k8s-app=kubernetes-dashboard" -o jsonpath="{.items[0].metadata.name}")
+
+kubectl -n $NAMESPACE port-forward $POD_NAME 8443:8443 &
+
+URL=https://127.0.0.1:8443/
+
+kubectl -n $NAMESPACE describe secret $(kubectl -n $NAMESPACE get secret | grep admin-user | awk '{print $1}')
+
+until curl --fail -k $URL >/dev/null 2>&1; do
+  sleep 1
+done
+
+xdg-open $URL
+
+echo
+echo "Press ^C to stop the proxy"
+wait
