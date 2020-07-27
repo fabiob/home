@@ -1,0 +1,31 @@
+#!/bin/bash
+set -o errexit -o pipefail -o noclobber -o nounset
+set -e
+
+run="n"
+pipe="cat"
+
+while [[ "$#" -gt 0 ]]; do
+    case "$1" in
+    --run | -y)
+        run="y"
+        ;;
+    --except | -v)
+        shift
+        pipe="$pipe | grep -v '$1'"
+        ;;
+    *)
+        echo "Parâmetro desconhecido: $1" >&2
+        exit 1
+        ;;
+    esac
+    shift
+done
+
+list=$( ! npm outdated )
+cmd=$( echo "$list" | awk 'NR > 1 { print $1"@latest" }' | sh -c "$pipe" | xargs -r echo npm install )
+echo "$cmd"
+
+if [ "$run" == "y" ]; then
+    echo "$cmd" | exec bash
+fi
