@@ -1,34 +1,34 @@
 [user]
-	name = Fábio Batista
-	email = fabio@elementarsistemas.com.br
+	name = Fabio Batista
 	signingkey = DB018B72
-[color]
-	diff = auto
-	status = auto
-	branch = auto
+	email = fabio@conectaijui.com.br
 [core]
 	autocrlf = input
-	excludesfile = /Users/fabio/.gitignore_global
-[push]
-	default = matching
-[filter "media"]
-	clean = git-media-clean %f
-	smudge = git-media-smudge %f
+	excludesfile = /home/fabio/.gitignore_global
 [alias]
 	undo-commit = reset --soft HEAD^
 	branch2tag = "!sh -c 'set -e;git tag $1 refs/heads/$1;git branch -D $1' -"
-	tags = tag --sort v:refname -n1
-[difftool "sourcetree"]
-	cmd = opendiff \"$LOCAL\" \"$REMOTE\"
-	path = 
-[mergetool "sourcetree"]
-	cmd = /Applications/SourceTree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
-	trustExitCode = true
+	tags = for-each-ref --sort='v:refname' --format="'%(align:10,left)%(taggerdate:short)%(end) %(align:10,left)%(color:red bold)%(refname:short)%(color:reset)%(end) %09 %(color:reset)%(align:60,left)%(subject)%(end) %(color:blue bold)%(*objectname:short)%(color:reset) %(color:blue)%(*contents:subject)%(color:reset)'" refs/tags
+	tags2 = for-each-ref --sort='v:refname' --format="'%(align:10,left)%(taggerdate:short)%(end) %(align:10,left)%(color:red bold)%(refname:short)%(color:reset)%(end) %09 %(color:reset)%(subject)%(color:reset) %0A %(align:24,left)%(end)%(color:blue bold)%(align:8,left)%(*objectname:short)%(end)%(color:reset) %(color:blue)%(*contents:subject)%(color:reset)'" refs/tags
+	log2 = log --pretty="'format:%C(yellow)%h %Cblue%>(15)%ad %Cgreen%<(8)%aN%Cred%d %Creset%s'" --date=relative
+[diff]
+	tool = meld
+[difftool]
+	prompt = false
+[difftool "meld"]
+	cmd = meld "$LOCAL" "$REMOTE"
 [filter "lfs"]
 	required = true
 	clean = git-lfs clean -- %f
 	smudge = git-lfs smudge -- %f
 	process = git-lfs filter-process
 [commit]
-	template = /Users/fabio/.stCommitMsg
+	gpsign = true
 	gpgsign = true
+[credential]
+	helper = !aws codecommit credential-helper $@
+	UseHttpPath = true
+[mailmap]
+	file = /home/fabio/.mailmap
+[pull]
+	rebase = true
