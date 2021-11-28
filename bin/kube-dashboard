@@ -14,7 +14,7 @@ until curl --fail -k $URL >/dev/null 2>&1; do
   sleep 1
 done
 
-xdg-open $URL
+firefox "$URL"
 
 echo
 echo "Press ^C to stop the proxy"
