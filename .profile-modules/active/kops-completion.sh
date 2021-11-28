@@ -1,1 +1,0 @@
-../modules/kops-completion.sh

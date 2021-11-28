@@ -1,1 +1,0 @@
-../modules/aws-completer.sh

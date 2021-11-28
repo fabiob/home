@@ -1,1 +1,0 @@
-../modules/rvm.sh

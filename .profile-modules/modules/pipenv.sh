@@ -1,1 +1,1 @@
-eval "$(/home/fabio/.local/bin/pipenv --completion)"
+eval "$( $HOME/.local/bin/pipenv --completion )"

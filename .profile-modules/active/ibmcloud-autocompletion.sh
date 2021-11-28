@@ -1,0 +1,1 @@
+../modules/ibmcloud-autocompletion.sh
