@@ -1,1 +1,0 @@
-source <( kops completion bash )
