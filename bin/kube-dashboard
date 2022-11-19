@@ -2,7 +2,10 @@
 set -e
 
 NAMESPACE=kubernetes-dashboard
-POD_NAME=$(kubectl get pods -n $NAMESPACE -l "k8s-app=kubernetes-dashboard" -o jsonpath="{.items[0].metadata.name}")
+POD_NAME=$(
+  kubectl get pods -n $NAMESPACE -l "app.kubernetes.io/component=kubernetes-dashboard" -o jsonpath="{.items[0].metadata.name}" ||
+  kubectl get pods -n $NAMESPACE -l "k8s-app=kubernetes-dashboard" -o jsonpath="{.items[0].metadata.name}"
+)
 
 kubectl -n $NAMESPACE port-forward $POD_NAME 8443:8443 &
 
