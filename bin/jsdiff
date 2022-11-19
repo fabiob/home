@@ -1,0 +1,6 @@
+#!/bin/bash
+arq1="$1"
+shift
+arq2="$1"
+shift
+meld "$@" <( jq --sort-keys . "$arq1" ) <( jq --sort-keys . "$arq2" )
