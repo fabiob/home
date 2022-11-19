@@ -1,0 +1,1 @@
+../modules/kubectl-plugins.sh
