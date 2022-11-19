@@ -1,2 +1,0 @@
-#!/bin/bash
-ssh core@$FLEETCTL_TUNNEL "fleetctl list-units" | egrep -v '^(UNIT|swapon|newrelic|deis-(logger|logspout|publisher|registry))' | sort -bk 2 | egrep --color "${1:-cmd}|$"
