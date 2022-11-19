@@ -1,7 +1,7 @@
 [user]
 	name = Fabio Batista
 	signingkey = DB018B72
-	email = fabio@conectaijui.com.br
+	email = fabio@atelie.dev.br
 [core]
 	autocrlf = input
 	excludesfile = /home/fabio/.gitignore_global
@@ -26,9 +26,11 @@
 	gpsign = true
 	gpgsign = true
 [credential]
-	helper = !aws codecommit credential-helper $@
+	helper = store
 	UseHttpPath = true
 [mailmap]
 	file = /home/fabio/.mailmap
 [pull]
-	rebase = true
+	rebase = false
+[init]
+	defaultBranch = main
