@@ -1,0 +1,1 @@
+../modules/krew.sh
