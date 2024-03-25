@@ -1,0 +1,29 @@
+#!/bin/sh
+
+usage() { echo "Usage: kubectl get ... -o name | $0 -n <namespace> <release-name>"; exit 1; }
+
+while getopts "n:" o; do
+    case "$o" in
+        n)
+            ns="$OPTARG"
+            ;;
+        *)
+            usage
+            ;;
+    esac
+done
+shift $((OPTIND-1))
+
+name="$1"
+
+[ -z "$ns" ] || [ -z "$name" ] && usage
+
+shift
+
+echo "# Use the following commands to absorb the selected components into the Helm chart:" >/dev/stderr
+echo >/dev/stderr
+
+while read obj; do
+    echo kubectl -n "$ns" label    "$obj" "app.kubernetes.io/managed-by=Helm"
+    echo kubectl -n "$ns" annotate "$obj" "meta.helm.sh/release-namespace=$ns" "meta.helm.sh/release-name=$name"
+done
