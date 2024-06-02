@@ -1,3 +1,5 @@
 #!/bin/sh
 set -e
-kubectl -n kafka run "kafka-shell-$$" -it --image=quay.io/strimzi/kafka:latest-kafka-3.6.1 --rm --restart=Never -- $@
+IMAGE=$(kubectl get pod -n kafka main-controller-0 -o jsonpath --template '{.spec.containers.*.image}')
+set -x
+kubectl -n kafka run "kafka-shell-$$" -it --image="$IMAGE" --rm --restart=Never --env "B=--bootstrap-server main-kafka-bootstrap.kafka:9092" -- $@
