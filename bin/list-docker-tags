@@ -1,0 +1,22 @@
+#!/bin/bash
+set -e
+set -o pipefail
+
+ns=${1%%/*}
+repo=${1:(${#ns}+1)}
+[ -z "${repo}" ] && echo "Usage: $0 <repoName>" 1>&2 && exit 1
+
+tmpdir=$(mktemp -d)
+function cleanup { rm -rf "$tmpdir"; }
+trap cleanup EXIT
+
+url="https://registry.hub.docker.com/v2/namespaces/${ns}/repositories/${repo}/tags?page_size=100"
+declare -i page
+while [[ $url != "null" ]]; do
+  ((page+=1))
+  fn=$(printf '%s/%05d.json' "$tmpdir" "$page")
+  curl --fail -s "$url" -o "$fn"
+  url=$(jq -r .next "$fn")
+done
+
+jq -rs '[.[] | .results[] | .name] | unique | reverse | .[]' "$tmpdir"/*.json
