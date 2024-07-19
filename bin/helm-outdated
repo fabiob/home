@@ -1,0 +1,4 @@
+#!/bin/sh
+nova find \
+| jq -r '.[] | select(.outdated) | [.namespace, .release, .chartName, .Installed.version, .Latest.version, .Installed.appVersion, .Latest.appVersion, .deprecated] | @tsv' \
+| column -t -N "Namespace,Release,Chart,Version,Latest,AppVersion,Latest,Deprecated"
