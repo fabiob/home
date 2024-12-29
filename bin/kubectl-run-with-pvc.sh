@@ -27,16 +27,19 @@ do
 done
 shift $(($OPTIND - 1))
 
-VOL_MOUNTS=""
-VOLS=""
+VOL_MOUNTS=()
+VOLS=()
 COMMA=""
 
-for i in $@
-do
-  VOL_MOUNTS="${VOL_MOUNTS}${COMMA}{\"name\": \"${i}\",\"mountPath\": \"/mnt/${i}\"}"
-  VOLS="${VOLS}${COMMA}{\"name\": \"${i}\",\"persistentVolumeClaim\": {\"claimName\": \"${i}\"}}"
-  COMMA=","
+for i in $@; do
+  # creates each JSON array element
+  VOL_MOUNTS+=("{ \"name\": \"${i}\", \"mountPath\": \"/mnt/${i}\" },")
+  VOLS+=("{ \"name\": \"${i}\", \"persistentVolumeClaim\": { \"claimName\": \"${i}\" } },")
 done
+
+# removes the trailing comma from each array
+VOL_MOUNTS[-1]="${VOL_MOUNTS[-1]::-1}"
+VOLS[-1]="${VOLS[-1]::-1}"
 
 set -x
 kubectl run -it --rm --restart=Never $KARGS --image=${IMAGE} pvc-mounter-${SUFFIX} --overrides "
@@ -45,14 +48,14 @@ kubectl run -it --rm --restart=Never $KARGS --image=${IMAGE} pvc-mounter-${SUFFI
     \"containers\": [
       {
         \"image\": \"${IMAGE}\", \"args\": [\"${COMMAND}\"],
-        \"stdin\": true, \"tty\": true, \"name\": \"pvc\",
+        \"stdin\": true, \"tty\": true, \"name\": \"pvc-mounter\",
         \"volumeMounts\": [
-          ${VOL_MOUNTS}
+$(printf '          %s\n' "${VOL_MOUNTS[@]}")
         ]
       }
     ],
     \"volumes\": [
-      ${VOLS}
+$(printf '      %s\n' "${VOLS[@]}")
     ]
   }
 }
