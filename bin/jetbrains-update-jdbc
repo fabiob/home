@@ -1,0 +1,85 @@
+#!/bin/env python
+import json
+import shutil
+from copy import copy
+from glob import glob
+from os.path import expanduser
+from pathlib import Path
+from urllib.request import urlopen
+
+from lxml import etree
+from lxml.etree import _Element
+
+RELEVANT_DRIVERS = {
+    "DuckDB": ("org.duckdb", "duckdb_jdbc"),
+}
+
+
+def main():
+    print("Fetching latest versions of relevant drivers...")
+    latest_versions = {}
+    for name, (group, artifact) in RELEVANT_DRIVERS.items():
+        r = urlopen(
+            f"https://search.maven.org/solrsearch/select?q=g:{group}+AND+a:{artifact}&core=gav&rows=1&wt=json",
+            timeout=10,
+        )
+        latest = Version.parse(json.load(r)["response"]["docs"][0]["v"])
+        latest_versions[name] = latest
+
+        print(f"  {name} => {latest}")
+
+    print("Finding JetBrains configuration files...")
+    xmls = glob(expanduser("~/.config/JetBrains/*/jdbc-drivers/jdbc-drivers.xml"))
+    for xml in xmls:
+        rel_name = Path(xml).relative_to(expanduser("~/.config/JetBrains/")).parts[0]
+        print(f"  {rel_name} => parsing")
+
+        changed = False
+        doc = etree.parse(xml)
+        ddb: _Element
+
+        for name, (group, artifact) in RELEVANT_DRIVERS.items():
+            latest = latest_versions[name]
+            for ddb in doc.xpath(f"/artifacts/artifact[@name='{name}']"):
+                registered_versions = sorted(
+                    (Version.parse(v) for v in ddb.xpath("version/@version")),
+                    reverse=True,
+                )
+
+                if not registered_versions:
+                    print(f"    [{name}] => not found, skipping")
+                    continue
+
+                if any(v >= latest for v in registered_versions):
+                    print(f"    [{name}] => already at latest version, skipping")
+                    continue
+
+                new: _Element = copy(ddb.xpath("version")[-1])
+                new.attrib["version"] = str(latest)
+                for i in new.xpath("item[@type='maven']"):
+                    i.attrib["url"] = f"{group}:{artifact}:{latest}"
+                ddb.append(new)
+
+                print(
+                    f"    [{name}] => has {max(registered_versions)}, adding {latest}"
+                )
+                changed = True
+
+        if not changed:
+            continue
+
+        shutil.move(xml, xml + ".bak")
+        doc.write(xml, pretty_print=True, encoding="utf-8", xml_declaration=True)
+
+
+class Version(tuple):
+    def __str__(self):
+        return ".".join(map(str, self))
+
+    @classmethod
+    def parse(cls, v):
+        return cls(int(p) for p in v.split("."))
+
+
+if __name__ == "__main__":
+    main()
