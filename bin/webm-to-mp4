@@ -1,0 +1,7 @@
+#!/bin/bash
+
+arq="$1"
+shift
+
+set -x
+ffmpeg -fflags +genpts -i "$arq" -r 24 "$@"
