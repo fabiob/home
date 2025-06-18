@@ -1,16 +1,17 @@
 #!/home/fabio/Projects/OpenSource/fabiob-home/.venv/bin/python3
 
 import email
-from email.policy import default as default_email_policy
+import json
 import re
-from typing import Annotated, IO
+import subprocess
+from email.policy import default as default_email_policy
+from typing import IO, Annotated, Iterable
 
 import pandas as pd
-
 import typer
 from rich.console import Console
 from rich.panel import Panel
-from rich.table import Table
+from rich.table import Column, Table
 from typer import FileText
 
 app = typer.Typer()
@@ -58,14 +59,17 @@ def parse_cron_emails(f: IO[str]):
                     )
 
     if not updates:
-        return pd.DataFrame(columns=["date", "package", "from", "to"])
+        return pd.DataFrame(columns=["date", "package", "from", "to", "from_str", "to_str", "kind", "description"])
 
     df = pd.DataFrame(updates)
 
     # Group by package and aggregate
     df = df.groupby("package").agg({"date": "max", "from": "min", "to": "max"}).reset_index()
 
+    df["from_str"] = df["from"].apply(".".join)
+    df["to_str"] = df["to"].apply(".".join)
     df["kind"] = df.apply(check_update_type, axis=1).astype("category")
+    df["description"] = load_descriptions(df["package"])
 
     return df.sort_values("package")
 
@@ -78,6 +82,15 @@ def check_update_type(row):
             return "minor"
         case _:
             return "patch"
+
+
+def load_descriptions(packages: Iterable[str]) -> list[str]:
+    try:
+        result = subprocess.run(["brew", "info", "--json=v1", *packages], capture_output=True, text=True)
+        if result.returncode == 0:
+            return [r["desc"] for r in json.loads(result.stdout)]
+    except subprocess.SubprocessError:
+        return []
 
 
 @app.command()
@@ -93,27 +106,20 @@ def main(file: Annotated[FileText, typer.Argument()]):
     tables = list[Table]()
     for n, kind in enumerate(("major", "minor", "patch")):
         t = Table(
-            "Package",
+            Column("Package", width=updates_df["package"].str.len().max()),
+            Column("Description", width=updates_df["description"].str.len().max()),
             "Date",
-            "From",
-            "To",
+            Column("From", width=updates_df["from_str"].str.len().max()),
+            Column("To", width=updates_df["to_str"].str.len().max()),
             title=kind.capitalize() + " Updates",
-            expand=True,
         )
         for _, row in updates_df[updates_df["kind"] == kind].iterrows():
             from_str = ".".join([p if i != n else f"[cyan]{p}" for i, p in enumerate(row["from"])]) + "[/cyan]"
             to_str = ".".join([p if i != n else f"[cyan]{p}" for i, p in enumerate(row["to"])]) + "[/cyan]"
-            t.add_row(row["package"], f"{row['date']:%Y-%m-%d}", from_str, to_str)
+            t.add_row(row["package"], row["description"], f"{row['date']:%Y-%m-%d}", from_str, to_str)
         tables.append(t)
 
-    left_table = Table(show_header=False, show_edge=False)
-    left_table.add_row(tables[0])
-    left_table.add_row(tables[1])
-
-    final_table = Table(show_header=False, show_edge=False, title="Package Updates")
-    final_table.add_row(left_table, tables[2])
-
-    console.print(final_table)
+    console.print(*reversed(tables))
 
 
 if __name__ == "__main__":
