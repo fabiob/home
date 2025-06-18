@@ -1,0 +1,120 @@
+#!/home/fabio/Projects/OpenSource/fabiob-home/.venv/bin/python3
+
+import email
+from email.policy import default as default_email_policy
+import re
+from typing import Annotated, IO
+
+import pandas as pd
+
+import typer
+from rich.console import Console
+from rich.panel import Panel
+from rich.table import Table
+from typer import FileText
+
+app = typer.Typer()
+
+
+def parse_cron_emails(f: IO[str]):
+    updates = []
+
+    content = f.read()
+    # Split into individual email messages
+    messages = content.split("\nFrom ")
+
+    for msg_text in messages:
+        if not msg_text.strip():
+            continue
+
+        # Parse email message
+        msg = email.message_from_string("From " + msg_text, policy=default_email_policy)
+
+        # Check if it's from Cron Daemon
+        from_header = msg.get("Subject", "")
+        if not from_header.startswith("Cron") or not from_header.endswith("brew upgrade"):
+            continue
+
+        # Get the date
+        date = msg.get("Date").datetime.date()
+
+        # Look for package updates in the body
+        for part in msg.walk():
+            if part.get_content_type() == "text/plain":
+                body = part.get_content()
+
+                matches = re.finditer(r"^(\S+) (\S+) -> (\S+)", body, flags=re.MULTILINE)
+                for match in matches:
+                    package = match.group(1).strip()
+                    from_version = match.group(2).strip()
+                    to_version = match.group(3).strip()
+                    updates.append(
+                        {
+                            "date": date,
+                            "package": package,
+                            "from": tuple(from_version.split(".")),
+                            "to": tuple(to_version.split(".")),
+                        }
+                    )
+
+    if not updates:
+        return pd.DataFrame(columns=["date", "package", "from", "to"])
+
+    df = pd.DataFrame(updates)
+
+    # Group by package and aggregate
+    df = df.groupby("package").agg({"date": "max", "from": "min", "to": "max"}).reset_index()
+
+    df["kind"] = df.apply(check_update_type, axis=1).astype("category")
+
+    return df.sort_values("package")
+
+
+def check_update_type(row):
+    match row["from"], row["to"]:
+        case ((f0, *_), (t0, *_)) if t0 > f0:
+            return "major"
+        case ((_, f1, *_), (_, t1, *_)) if t1 > f1:
+            return "minor"
+        case _:
+            return "patch"
+
+
+@app.command()
+def main(file: Annotated[FileText, typer.Argument()]):
+    console = Console()
+
+    updates_df = parse_cron_emails(file)
+
+    if len(updates_df) == 0:
+        console.print(Panel("No package updates found in the emails"))
+        return
+
+    tables = list[Table]()
+    for n, kind in enumerate(("major", "minor", "patch")):
+        t = Table(
+            "Package",
+            "Date",
+            "From",
+            "To",
+            title=kind.capitalize() + " Updates",
+            expand=True,
+        )
+        for _, row in updates_df[updates_df["kind"] == kind].iterrows():
+            from_str = ".".join([p if i != n else f"[cyan]{p}" for i, p in enumerate(row["from"])]) + "[/cyan]"
+            to_str = ".".join([p if i != n else f"[cyan]{p}" for i, p in enumerate(row["to"])]) + "[/cyan]"
+            t.add_row(row["package"], f"{row['date']:%Y-%m-%d}", from_str, to_str)
+        tables.append(t)
+
+    left_table = Table(show_header=False, show_edge=False)
+    left_table.add_row(tables[0])
+    left_table.add_row(tables[1])
+
+    final_table = Table(show_header=False, show_edge=False, title="Package Updates")
+    final_table.add_row(left_table, tables[2])
+
+    console.print(final_table)
+
+
+if __name__ == "__main__":
+    app()
