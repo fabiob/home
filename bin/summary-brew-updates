@@ -64,7 +64,9 @@ def parse_cron_emails(f: IO[str]):
     df = pd.DataFrame(updates)
 
     # Group by package and aggregate
-    df = df.groupby("package").agg({"date": "max", "from": "min", "to": "max"}).reset_index()
+    g = df.groupby("package")
+    df["qty"] = g["package"].transform("count")
+    df = g.agg({"date": "max", "from": "min", "to": "max", "qty": "first"}).reset_index()
 
     df["from_str"] = df["from"].apply(".".join)
     df["to_str"] = df["to"].apply(".".join)
@@ -105,18 +107,24 @@ def main(file: Annotated[FileText, typer.Argument()]):
 
     tables = list[Table]()
     for n, kind in enumerate(("major", "minor", "patch")):
+        slice = updates_df[updates_df["kind"] == kind]
+        if len(slice) == 0:
+            continue
+
         t = Table(
             Column("Package", width=updates_df["package"].str.len().max()),
             Column("Description", width=updates_df["description"].str.len().max()),
-            "Date",
+            Column("Date", width=10),
             Column("From", width=updates_df["from_str"].str.len().max()),
             Column("To", width=updates_df["to_str"].str.len().max()),
-            title=kind.capitalize() + " Updates",
+            Column("#", width=3, justify="center"),
+            title=f" {kind.capitalize()} Updates ({len(slice)})",
+            title_justify="left",
         )
-        for _, row in updates_df[updates_df["kind"] == kind].iterrows():
+        for _, row in slice.iterrows():
             from_str = ".".join([p if i != n else f"[cyan]{p}" for i, p in enumerate(row["from"])]) + "[/cyan]"
             to_str = ".".join([p if i != n else f"[cyan]{p}" for i, p in enumerate(row["to"])]) + "[/cyan]"
-            t.add_row(row["package"], row["description"], f"{row['date']:%Y-%m-%d}", from_str, to_str)
+            t.add_row(row["package"], row["description"], f"{row['date']:%Y-%m-%d}", from_str, to_str, str(row["qty"]))
         tables.append(t)
 
     console.print(*reversed(tables))
