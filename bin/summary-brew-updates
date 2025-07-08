@@ -5,7 +5,7 @@ import json
 import re
 import subprocess
 from email.policy import default as default_email_policy
-from typing import IO, Annotated, Iterable
+from typing import IO, Annotated, Iterable, Sequence
 
 import pandas as pd
 import typer
@@ -95,6 +95,10 @@ def load_descriptions(packages: Iterable[str]) -> list[str]:
         return []
 
 
+def highlight_version_part(part: Sequence[str], n: int, *, color: str = "cyan") -> str:
+    return ".".join([p if i != n else f"[{color}]{p}" for i, p in enumerate(part)]) + (f"[/{color}]" if n < len(part) else "")
+
+
 @app.command()
 def main(file: Annotated[FileText, typer.Argument()]):
     console = Console()
@@ -122,8 +126,8 @@ def main(file: Annotated[FileText, typer.Argument()]):
             title_justify="left",
         )
         for _, row in slice.iterrows():
-            from_str = ".".join([p if i != n else f"[cyan]{p}" for i, p in enumerate(row["from"])]) + "[/cyan]"
-            to_str = ".".join([p if i != n else f"[cyan]{p}" for i, p in enumerate(row["to"])]) + "[/cyan]"
+            from_str = highlight_version_part(row["from"], n)
+            to_str = highlight_version_part(row["to"], n)
             t.add_row(row["package"], row["description"], f"{row['date']:%Y-%m-%d}", from_str, to_str, str(row["qty"]))
         tables.append(t)
 
